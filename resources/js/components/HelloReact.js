@@ -38,7 +38,9 @@ export default function HelloReact() {
         if (data.length <= 0 && requestFlag) {
             axios.get("/getData").then((response) => {
                 if (response.data.length > 0) {
-                    const staff = response.data.map((i) => i.STR_STAFF_NBR);
+                    const staff = [
+                        ...new Set(response.data.map((i) => i.STR_STAFF_NBR)),
+                    ];
                     setStaffNumbers(staff);
                     let objData = response.data.map((item, key) => {
                         const obj_date = item.DATE;
@@ -115,12 +117,45 @@ export default function HelloReact() {
 
     const handleEventDrop = (event) => {
         const stateData = [...data];
-        const index = stateData.findIndex((e) => e.id === event.event.id);
-        stateData[index] = event.event.toPlainObject();
+        const stateBackup = [...backupData];
+        const index = stateData.findIndex((e) => e.id == event.event.id);
+        const backupIndex = stateBackup.findIndex(
+            (e) => e.id == event.event.id
+        );
+        const updatedData = event.event.toPlainObject();
+        stateData[index] = updatedData;
+        stateBackup[backupIndex] = updatedData;
         setData(stateData);
+        setBackupData(stateBackup);
     };
 
-    const handleCustomButtonClick = () => {};
+    const compareAndMakeUnique = (list1, list2) => {
+        const unique = [];
+
+        for (let i = 0; i < list1.length; i++) {
+            const obj1 = list1[i];
+            let isDuplicate = false;
+
+            for (let j = 0; j < list2.length; j++) {
+                const obj2 = list2[j];
+
+                if (JSON.stringify(obj1) === JSON.stringify(obj2)) {
+                    isDuplicate = true;
+                    list2.splice(j, 1);
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                unique.push(obj1);
+            }
+        }
+        unique.push(...list2);
+        return unique;
+    };
+
+    const handleCustomButtonClick = () => {
+        //Todo: Send DB request to update data in DB.
+    };
 
     return (
         <div className="row justify-content-center">

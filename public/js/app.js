@@ -2181,9 +2181,9 @@ function HelloReact() {
     if (data.length <= 0 && requestFlag) {
       axios__WEBPACK_IMPORTED_MODULE_2___default().get("/getData").then(function (response) {
         if (response.data.length > 0) {
-          var staff = response.data.map(function (i) {
+          var staff = _toConsumableArray(new Set(response.data.map(function (i) {
             return i.STR_STAFF_NBR;
-          });
+          })));
           setStaffNumbers(staff);
           var objData = response.data.map(function (item, key) {
             var _item$STARTTIME, _item$ENDTIME;
@@ -2240,13 +2240,42 @@ function HelloReact() {
   };
   var handleEventDrop = function handleEventDrop(event) {
     var stateData = _toConsumableArray(data);
+    var stateBackup = _toConsumableArray(backupData);
     var index = stateData.findIndex(function (e) {
-      return e.id === event.event.id;
+      return e.id == event.event.id;
     });
-    stateData[index] = event.event.toPlainObject();
+    var backupIndex = stateBackup.findIndex(function (e) {
+      return e.id == event.event.id;
+    });
+    var updatedData = event.event.toPlainObject();
+    stateData[index] = updatedData;
+    stateBackup[backupIndex] = updatedData;
     setData(stateData);
+    setBackupData(stateBackup);
   };
-  var handleCustomButtonClick = function handleCustomButtonClick() {};
+  var compareAndMakeUnique = function compareAndMakeUnique(list1, list2) {
+    var unique = [];
+    for (var i = 0; i < list1.length; i++) {
+      var obj1 = list1[i];
+      var isDuplicate = false;
+      for (var j = 0; j < list2.length; j++) {
+        var obj2 = list2[j];
+        if (JSON.stringify(obj1) === JSON.stringify(obj2)) {
+          isDuplicate = true;
+          list2.splice(j, 1);
+          break;
+        }
+      }
+      if (!isDuplicate) {
+        unique.push(obj1);
+      }
+    }
+    unique.push.apply(unique, _toConsumableArray(list2));
+    return unique;
+  };
+  var handleCustomButtonClick = function handleCustomButtonClick() {
+    //Todo: Send DB request to update data in DB.
+  };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
     className: "row justify-content-center",
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
